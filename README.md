@@ -41,14 +41,14 @@ Because false positives score 0.0 and not -1.0, the system must be precision-ori
 ## Repository Structure
 
 ```
-aer-causal-reasoning-system/
+Abductive_Event_Reasoning/
 │
 ├── README.md
 ├── requirements.txt
 │
 ├── notebooks/
-│   ├── initial_method.ipynb
-│   └── elite_architecture.ipynb
+│   ├── SemEval2026_Task_12_My_Init_Method.ipynb
+│   └── SemEval2026_Task_12_Upgraded.ipynb
 │
 └── images/
     └── aer_analysis_dashboard.png
@@ -56,8 +56,8 @@ aer-causal-reasoning-system/
 
 ### `notebooks/`
 
-- **`initial_method.ipynb`** — The first complete working pipeline for evidence-grounded causal reasoning.
-- **`elite_architecture.ipynb`** — A fully upgraded system developed after analyzing limitations in the initial pipeline.
+- **`SemEval2026_Task_12_My_Init_Method.ipynb`** — The first complete working pipeline for evidence-grounded causal reasoning.
+- **`SemEval2026_Task_12_Upgraded.ipynb`** — A fully upgraded system developed after analyzing limitations in the initial pipeline.
 
 ### `images/`
 
@@ -122,7 +122,7 @@ Identify which explanations are directly supported by evidence in the topic docu
 
 ## Phase 1 Initial Method
 
-`notebooks/initial_method.ipynb`
+`notebooks/SemEval2026_Task_12_My_Init_Method.ipynb`
 
 The first working system establishes the core evidence-grounded pipeline. Instead of fine-tuning a model to answer questions directly from raw text, the pipeline first retrieves supporting evidence and then verifies each candidate explanation against that evidence independently.
 
@@ -219,7 +219,7 @@ Each of these findings maps directly to a component added in Phase 2.
 
 ## Phase 2 Upgraded Architecture
 
-`notebooks/elite_architecture.ipynb`
+`notebooks/SemEval2026_Task_12_Upgraded.ipynb`
 
 The elite system addresses each failure mode systematically. It introduces five new components, upgrades two existing ones, and adds an ensemble strategy.
 
@@ -479,7 +479,7 @@ The verifier model is highly capable of separating supported explanations from d
 
 ## System Analysis Dashboard
 
-The analysis code (Cells 36-44 in `elite_architecture.ipynb`) produces a 9-panel diagnostic dashboard saved to `images/aer_analysis_dashboard.png`.
+The analysis code (Cells 36-44 in `SemEval2026_Task_12_Upgraded.ipynb`) produces a 9-panel diagnostic dashboard saved to `images/aer_analysis_dashboard.png`.
 
 ![AER System Analysis Dashboard](images/aer_analysis_dashboard.png)
 
@@ -543,30 +543,146 @@ Even after all upgrades, `|gold| = 2` questions score meaningfully lower than `|
 
 ## Reproducing the Experiments
 
-**Install dependencies:**
+### 1. Clone or Download This Repository
+
+```bash
+git clone https://github.com/your-username/Abductive_Event_Reasoning.git
+cd Abductive_Event_Reasoning
+```
+
+---
+
+### 2. Download the Dataset
+
+This system uses the official dataset from **SemEval-2026 Task 12: Abductive Event Reasoning (AER)**.
+
+> [Official Dataset Repository — SemEval-2026 Task 12](https://github.com/your-org/semeval2026-task12-dataset)
+>
+> [Codabench Competition Page](https://www.codabench.org/competitions/12440/)
+
+The dataset is organized into four splits — `sample_data`, `train_data`, `dev_data`, and `test_data` — each containing two files:
+
+```
+semeval2026-task12-dataset-main/
+│
+├── sample_data/
+│   ├── questions.jsonl # 200 questions  (with golden_answer)
+│   └── docs.json # 10 topic doc bundles
+│
+├── train_data/
+│   ├── questions.jsonl # 1,819 questions (with golden_answer)
+│   └── docs.json # 36 topic doc bundles
+│
+├── dev_data/
+│   ├── questions.jsonl # 400 questions  (with golden_answer)
+│   └── docs.json  # 36 topic doc bundles
+│
+└── test_data/
+    ├── questions.jsonl # 612 questions  (golden_answer removed)
+    └── docs.json # 24 topic doc bundles
+```
+
+**`questions.jsonl` — one record per line:**
+
+```json
+{
+  "topic_id": 4,
+  "id": "q-1",
+  "target_event": "Videos of the assassination circulated on social media.",
+  "option_A": "The shooter used a handmade gun.",
+  "option_B": "Security arrested the suspected gunman, Tetsuya Yamagami.",
+  "option_C": "Shinzo Abe became the deputy chief cabinet secretary in the early 2000s.",
+  "option_D": "A man fired twice at Shinzo Abe.",
+  "golden_answer": "D"
+}
+```
+
+**`docs.json` — retrieved contextual documents per topic:**
+
+```json
+{
+  "topic_id": 4,
+  "topic": "Assassination of Shinzo Abe",
+  "docs": [
+    {
+      "title": "Article title",
+      "id": "doc-001",
+      "link": "https://example.com",
+      "snippet": "Short summary of the document.",
+      "source": "News source",
+      "content": "Full document text."
+    }
+  ]
+}
+```
+
+> **Note:** `golden_answer` contains one or more correct option labels (e.g., `"A"` or `"A,B"`). It is present in `sample_data`, `train_data`, and `dev_data` but **removed** in `test_data`.
+
+Once downloaded, place the dataset folder inside the repository:
+
+```
+Abductive_Event_Reasoning/
+├── notebooks/
+├── images/
+├── README.md
+├── requirements.txt
+└── data/
+    └── semeval2026-task12-dataset-main/
+        ├── sample_data/
+        ├── train_data/
+        ├── dev_data/
+        └── test_data/
+```
+
+---
+
+### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-**Run Phase 1 (initial method):**
+---
+
+### 4. Run the Notebooks
+
+The notebooks are provided in `.ipynb` format and can be opened with Jupyter Notebook or JupyterLab.
+
 ```bash
-jupyter nbconvert --to notebook --execute notebooks/initial_method.ipynb
+jupyter notebook notebooks/SemEval2026_Task_12_My_Init_Method.ipynb
+jupyter notebook notebooks/SemEval2026_Task_12_Upgraded.ipynb
 ```
 
-**Run Phase 2 (upgraded system):**
-```bash
-jupyter nbconvert --to notebook --execute notebooks/elite_architecture.ipynb
-```
+> **Recommended order:** Run `SemEval2026_Task_12_My_Init_Method.ipynb` first to understand the baseline pipeline before proceeding to `SemEval2026_Task_12_Upgraded.ipynb`.
 
-Both notebooks are fully self-contained. They unzip the dataset, build all indexes, train all models, run evaluation, and produce outputs in the configured `OUT_DIR`.
+Each notebook covers the full end-to-end workflow:
 
-**Expected outputs from Phase 2:**
-- `output/submission_seed42.jsonl` — single-run predictions
-- `output/submission_ensemble.jsonl` — 6-run ensemble predictions
-- `output/analysis_plots/analysis_dashboard.png` — 9-panel diagnostic dashboard
-- Terminal output of paper-ready summary table (Cell 45)
+- **Data loading** — reads `questions.jsonl` and `docs.json` from the downloaded splits
+- **Preprocessing** — document chunking and retrieval index construction per `topic_id`
+- **Retrieval** — BM25 + dense hybrid retrieval linking questions to their topic documents
+- **Verifier training** — model training using `train_data` and validation on `dev_data`
+- **Prediction** — generates final answer outputs for `test_data`
+- **Analysis** — produces evaluation figures including the AER dashboard
 
-**Hardware:** Both notebooks target a single NVIDIA T4 GPU (Google Colab). The elite system enables gradient checkpointing and `fp16` to fit within T4 VRAM limits. CPU-only execution is supported but significantly slower.
+---
+
+### 5. Submit Predictions
+
+The official evaluation for SemEval-2026 Task 12 is hosted on **Codabench**.
+
+> [https://www.codabench.org/competitions/12440/](https://www.codabench.org/competitions/12440/)
+
+Submit your prediction file in the format required by the competition guidelines. Scoring uses an exact and partial matching scheme:
+
+| Outcome | Condition | Score |
+|---|---|---|
+| Full Match | Predicted set equals gold set | 1.0 |
+| Partial Match | Prediction is a non-empty proper subset of gold (no incorrect options) | 0.5 |
+| Incorrect | Prediction contains any wrong option or is empty | 0.0 |
+
+The final system score is the **average across all evaluation instances**.
+
+**Hardware:** Both notebooks target a single NVIDIA T4 GPU (Google Colab). The upgraded system enables gradient checkpointing and `fp16` to fit within T4 VRAM limits. CPU-only execution is supported but significantly slower.
 
 ---
 
